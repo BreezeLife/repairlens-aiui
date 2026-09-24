@@ -15,7 +15,7 @@
 
 ## Current Constraint
 
-- The current workspace has no Git repository or configured GitHub remote yet.
+- The workspace now has a local Git repository on `main`; no GitHub remote is configured yet.
 - Rokid hardware, Android project scaffolding, and device credentials are not available in the current workspace yet.
 - The exact Rokid glasses model and AIUI host/runtime are still unknown, so camera availability and final viewport must remain provisional until tested.
 - The official web Skill has been located, but it has not yet been enabled against a RepairLens workspace.

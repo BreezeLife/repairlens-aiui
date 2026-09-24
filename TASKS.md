@@ -2,7 +2,7 @@
 
 ## Pending
 
-- [ ] Initialize or restore the GitHub repository and configure its remote.
+- [x] Initialize the local Git repository; configure a GitHub remote when the destination is available.
 - [ ] Commit and push project milestones throughout development.
 - [x] Include an open-source license and a README with setup and run instructions.
 - [x] Define the Rokid Glasses user workflow and device/cloud boundary.

@@ -57,19 +57,19 @@
 |------|-------|----------|--------|--------|
 | Repository scan | Empty project workspace | No duplicate app implementation | Only project records existed | PASS |
 | ROKID/AIUI device validation | No connected device | Evidence captured or blocker recorded | Device unavailable | BLOCKED |
-| GitHub remote | Current workspace | Configured remote | No Git repository | BLOCKED |
+| GitHub remote | Current workspace | Configured remote | No remote URL supplied | BLOCKED |
 | Backend + static validation | Local workspace | Contract tests and project structure pass | 12 tests pass; validator pass | PASS |
 | Backend HTTP smoke test | Escalated local process | `/health` and HVAC analyze response | 200; complete fallback contract | PASS |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
 |-----------|-------|---------|------------|
-| 2026-09-25 | No Git repository in workspace | 1 | Continue source creation; retain remote setup as a pending external gate |
+| 2026-09-25 | No Git repository in workspace | 1 | Initialized local repository; retain remote setup as a pending external gate |
 | 2026-09-25 | Several concurrent GitHub Raw requests timed out | 1 | Retain verified local/official guidance and continue without repeating the same request pattern |
 | 2026-09-25 | Default sandbox denied loopback binding | 1 | Ran one controlled escalated smoke test, then stopped the process; in-memory tests remain the default CI path |
 
 ## 5-Question Reboot Check
-The local implementation and verification phases are complete. Studio, device, Nebius deployment, and GitHub evidence remain external gates.
+The local implementation, verification, and Git initialization phases are complete. Studio, device, Nebius deployment, and GitHub remote/evidence remain external gates.
 
 | Question | Answer |
 |----------|--------|
