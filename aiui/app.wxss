@@ -1,0 +1,13 @@
+:root {
+  --repair-green: #40ff5e;
+  --repair-green-dim: #1e8f35;
+  --repair-ink: #07110a;
+  --repair-line: #2d6d39;
+  --repair-muted: #9ebca4;
+}
+
+page {
+  background-color: var(--repair-ink);
+  color: var(--repair-green);
+}
+
