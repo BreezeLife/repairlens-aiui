@@ -1,4 +1,5 @@
 const DEFAULT_EQUIPMENT = 'HVAC condenser';
+const DEMO_SYMPTOM = 'Fan starts, then stops after two minutes';
 const RISK_LEVELS = new Set(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'UNKNOWN']);
 
 function text(value, fallback, maxLength) {
@@ -25,12 +26,29 @@ export function buildPrompt({ equipment = DEFAULT_EQUIPMENT, symptom = '', conte
 
 export function buildDemoPlan(input = {}) {
   const equipment = input.equipment || DEFAULT_EQUIPMENT;
-  const symptom = input.symptom || 'Fan starts, then stops after two minutes';
+  const symptom = input.symptom || DEMO_SYMPTOM;
+  const isDemoCase = equipment.trim().toLowerCase() === DEFAULT_EQUIPMENT.toLowerCase()
+    && symptom.trim().toLowerCase() === DEMO_SYMPTOM.toLowerCase();
+  if (!isDemoCase) {
+    return {
+      provider: 'demo-fallback',
+      model: 'repairlens-demo',
+      equipment,
+      symptom,
+      actionable: false,
+      summary: 'No approved repair procedure is available for this case in offline mode.',
+      risk: 'UNKNOWN',
+      nextAction: 'Pause work and obtain the equipment-specific service procedure before continuing.',
+      steps: [],
+      evidence: [],
+    };
+  }
   return {
     provider: 'demo-fallback',
     model: 'repairlens-demo',
     equipment,
     symptom,
+    actionable: true,
     summary: 'Start with isolation, airflow, and visible evidence before opening the electrical panel.',
     risk: 'MEDIUM',
     nextAction: 'Confirm the unit is isolated before inspecting the filter and outdoor coil.',

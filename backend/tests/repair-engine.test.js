@@ -5,14 +5,23 @@ import { analyzeRepair } from '../server.js';
 
 test('demo plan is deterministic and contains a safety-first sequence', () => {
   const plan = buildDemoPlan({
-    equipment: 'Pump controller',
-    symptom: 'Controller resets under load',
+    equipment: 'HVAC condenser',
+    symptom: 'Fan starts, then stops after two minutes',
   });
   assert.equal(plan.provider, 'demo-fallback');
-  assert.equal(plan.equipment, 'Pump controller');
+  assert.equal(plan.actionable, true);
   assert.equal(plan.steps[0].id, 'isolate');
   assert.match(plan.steps[0].detail, /disconnect|power/i);
   assert.ok(plan.evidence.length > 0);
+});
+
+test('offline mode blocks repair steps for cases without a fixture', () => {
+  const plan = buildDemoPlan({ equipment: 'Pump controller', symptom: 'Controller resets under load' });
+  assert.equal(plan.actionable, false);
+  assert.equal(plan.risk, 'UNKNOWN');
+  assert.deepEqual(plan.steps, []);
+  assert.deepEqual(plan.evidence, []);
+  assert.match(plan.nextAction, /equipment-specific service procedure/);
 });
 
 test('model response is normalized into the glasses contract', () => {
@@ -69,5 +78,6 @@ test('provider failures return a deterministic warning-bearing fallback', async 
   );
   assert.equal(plan.provider, 'demo-fallback');
   assert.equal(plan.warning, 'provider unavailable');
+  assert.equal(plan.actionable, false);
   assert.ok(plan.requestId);
 });

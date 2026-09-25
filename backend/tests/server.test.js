@@ -72,8 +72,8 @@ test('analyze endpoint returns the complete repair contract', async () => {
   assert.equal(response.status, 200);
   assert.equal(response.body.equipment, 'Pump');
   assert.ok(response.body.requestId);
-  assert.ok(response.body.steps.length > 0);
-  assert.ok(response.body.evidence.length > 0);
+  assert.equal(response.body.actionable, false);
+  assert.deepEqual(response.body.steps, []);
 });
 
 test('analyze endpoint requires both issue fields', async () => {

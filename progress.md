@@ -51,6 +51,7 @@
 - Actions taken:
   - Reviewed source/docs for unsupported `GlobalHook`, camera, `_current`, `_blank`, and speech-transcript claims.
   - Updated `TASKS.md`, `task_plan.md`, `PROJECT.md`, and this log to reflect the actual handoff state.
+  - Restricted deterministic offline repair steps to the documented HVAC fixture; unsupported cases now pause with `actionable: false` and no evidence-free steps.
 
 ## Test Results
 | Test | Input | Expected | Actual | Status |
@@ -58,7 +59,7 @@
 | Repository scan | Empty project workspace | No duplicate app implementation | Only project records existed | PASS |
 | ROKID/AIUI device validation | No connected device | Evidence captured or blocker recorded | Device unavailable | BLOCKED |
 | GitHub remote | Current workspace | Configured remote | No remote URL supplied | BLOCKED |
-| Backend + static validation | Local workspace | Contract tests and project structure pass | 12 tests pass; validator pass | PASS |
+| Backend + static validation | Local workspace | Contract tests and project structure pass | 13 tests pass; validator pass | PASS |
 | Backend HTTP smoke test | Escalated local process | `/health` and HVAC analyze response | 200; complete fallback contract | PASS |
 
 ## Error Log

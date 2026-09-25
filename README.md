@@ -59,6 +59,7 @@ Copy `backend/.env.example` to `backend/.env` and set:
 - `NEBIUS_MODEL`: eligible NVIDIA open source model served by Token Factory
 
 Without these values, the backend deliberately returns a deterministic demo plan so the workflow remains testable.
+The offline repair sequence applies only to the documented HVAC condenser symptom. Other cases return `actionable: false` with no repair steps until an equipment-specific procedure is available.
 
 The regular `npm --prefix backend start` command uses process environment variables. To load a local `.env` file, use Node 20.6+:
 

@@ -68,6 +68,18 @@ function initialState() {
 
 function normalizePlan(plan) {
   const source = plan && typeof plan === 'object' ? plan : DEMO_PLAN;
+  if (source.actionable === false) {
+    return {
+      provider: source.provider || 'unknown',
+      equipment: source.equipment || DEMO_PLAN.equipment,
+      summary: source.summary || 'No approved procedure is available for this case.',
+      risk: source.risk || 'UNKNOWN',
+      nextAction: source.nextAction || 'Pause work and obtain the equipment-specific service procedure.',
+      steps: [],
+      evidence: [],
+      actionable: false,
+    };
+  }
   const rawSteps = Array.isArray(source.steps) && source.steps.length ? source.steps : DEMO_PLAN.steps;
   const steps = rawSteps.slice(0, 6).map((step, index) => ({
     id: String(step.id || `step-${index + 1}`),
@@ -85,6 +97,7 @@ function normalizePlan(plan) {
     evidence: Array.isArray(source.evidence) && source.evidence.length
       ? source.evidence.slice(0, 3)
       : DEMO_PLAN.evidence,
+    actionable: true,
   };
 }
 
@@ -186,6 +199,20 @@ export default {
   },
 
   applyPlan(plan, usedFallback = false) {
+    if (!plan.actionable) {
+      this.setData({
+        flowState: 'blocked',
+        status: 'PROCEDURE NEEDED',
+        summary: plan.summary,
+        risk: plan.risk,
+        nextAction: plan.nextAction,
+        steps: [],
+        evidence: [],
+        provider: plan.provider,
+        lastInput: 'Case paused',
+      });
+      return;
+    }
     const stepState = getCurrentStep(plan, 0);
     this.setData({
       flowState: 'step',
@@ -252,13 +279,13 @@ export default {
       <text class="provider">{{provider}}</text>
     </view>
 
-    <view class="case-panel" ink:if="{{flowState === 'ready' || flowState === 'loading' || flowState === 'error'}}">
+    <view class="case-panel" ink:if="{{flowState === 'ready' || flowState === 'loading' || flowState === 'error' || flowState === 'blocked'}}">
       <text class="label">CASE</text>
       <text class="case-title">{{equipment}}</text>
       <text class="symptom">{{symptom}}</text>
     </view>
 
-    <view class="summary-panel" ink:if="{{flowState === 'ready' || flowState === 'loading' || flowState === 'error'}}">
+    <view class="summary-panel" ink:if="{{flowState === 'ready' || flowState === 'loading' || flowState === 'error' || flowState === 'blocked'}}">
       <text class="label">ASSESSMENT</text>
       <text class="summary">{{summary}}</text>
       <view class="risk-row">
@@ -300,6 +327,7 @@ export default {
       <button class="primary" bindtap="startRepair" ink:if="{{flowState === 'ready' || flowState === 'error'}}">START REPAIR</button>
       <button class="primary" bindtap="confirmStep" ink:if="{{flowState === 'step'}}">CONFIRM STEP</button>
       <button class="primary" bindtap="resetFlow" ink:if="{{flowState === 'complete'}}">NEW CASE</button>
+      <button class="primary" bindtap="resetFlow" ink:if="{{flowState === 'blocked'}}">NEW CASE</button>
     </view>
 
   </view>
