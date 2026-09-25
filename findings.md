@@ -29,7 +29,7 @@
 ## Issues Encountered
 | Issue | Resolution |
 |-------|------------|
-| No current Git remote | Keep GitHub sync in the repository contract and leave remote configuration as a pending task |
+| GitHub remote was initially unavailable | Configured `origin` and verified the public `main` commit matches the local branch |
 | No hardware or Studio runtime | Build source and static/local verification, mark external evidence blocked |
 | Parallel GitHub Raw fetch timed out for several files | Use the successfully fetched official structure/event documents and avoid repeating the same concurrent fetch pattern |
 
@@ -47,7 +47,7 @@
 - Working OSS reference: PASS (official AIUI project structure and samples identified)
 - Root cause clarity: PASS (local implementation is complete; remaining blockers are external hardware/runtime/remote availability)
 - Local verification: PASS (`npm test`, 12 tests; root static validator)
-- External verification: BLOCKED (AIUI Studio, physical device, Nebius deployment, GitHub remote)
+- External verification: BLOCKED (AIUI Studio, physical device, Nebius deployment); GitHub remote/push verified
 - Confidence: 92% for local source contract; device behavior remains unverified
 
 ## Implementation Findings

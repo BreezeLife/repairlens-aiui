@@ -15,9 +15,9 @@
 
 ## Current Constraint
 
-- The workspace now has a local Git repository on `main`; no GitHub remote is configured yet.
+- The workspace has a local Git repository on `main`, with `origin` configured as `https://github.com/BreezeLife/repairlens-aiui.git`; local `main` matches the public remote.
 - Rokid hardware, Android project scaffolding, and device credentials are not available in the current workspace yet.
 - The exact Rokid glasses model and AIUI host/runtime are still unknown, so camera availability and final viewport must remain provisional until tested.
 - The official web Skill has been located, but it has not yet been enabled against a RepairLens workspace.
 - The local AIUI/backend source and deterministic test contract are implemented. The Page records confirmations only for the current session; durable export is not implemented in v0.
-- `GlobalHook`, camera, `_current`/`_blank` host behavior, Nebius deployment, Studio import, physical-device input, and GitHub remote remain external evidence gates.
+- `GlobalHook`, camera, `_current`/`_blank` host behavior, Nebius deployment, Studio import, and physical-device input remain external evidence gates.

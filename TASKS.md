@@ -3,7 +3,7 @@
 ## Pending
 
 - [x] Initialize the local Git repository; configure a GitHub remote when the destination is available.
-- [ ] Commit and push project milestones throughout development.
+- [x] Commit and push project milestones throughout development.
 - [x] Include an open-source license and a README with setup and run instructions.
 - [x] Define the Rokid Glasses user workflow and device/cloud boundary.
 - [ ] Confirm the exact ROKID Glasses model, AIUI host/runtime, and available camera/input capabilities.

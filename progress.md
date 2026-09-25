@@ -41,10 +41,10 @@
 ### Phase 4: Testing & Verification
 - **Status:** complete for local/static gates; external gates blocked
 - Actions taken:
-  - `npm test`: 12 backend tests passed and AIUI 0.17 static validation passed.
+  - `npm test`: 13 backend tests passed and AIUI 0.17 static validation passed.
   - Node syntax checks passed for backend, tests, and validation script.
   - Replaced network-listen integration tests with in-memory HTTP handler tests because the local sandbox denies loopback binding.
-  - Kept AIUI Studio, physical ROKID, Nebius deployment, and GitHub remote evidence explicitly blocked.
+  - Kept AIUI Studio, physical ROKID, and Nebius deployment evidence explicitly blocked; verified the GitHub remote and pushed `main`.
 
 ### Phase 5: Delivery
 - **Status:** complete
@@ -58,24 +58,24 @@
 |------|-------|----------|--------|--------|
 | Repository scan | Empty project workspace | No duplicate app implementation | Only project records existed | PASS |
 | ROKID/AIUI device validation | No connected device | Evidence captured or blocker recorded | Device unavailable | BLOCKED |
-| GitHub remote | Current workspace | Configured remote | No remote URL supplied | BLOCKED |
+| GitHub remote and push | Current workspace | Configured remote and matching commit | `origin/main` matches the public repository | PASS |
 | Backend + static validation | Local workspace | Contract tests and project structure pass | 13 tests pass; validator pass | PASS |
 | Backend HTTP smoke test | Escalated local process | `/health` and HVAC analyze response | 200; complete fallback contract | PASS |
 
 ## Error Log
 | Timestamp | Error | Attempt | Resolution |
 |-----------|-------|---------|------------|
-| 2026-09-25 | No Git repository in workspace | 1 | Initialized local repository; retain remote setup as a pending external gate |
+| 2026-09-25 | No Git repository in workspace | 1 | Initialized local repository, configured `origin`, and pushed `main` |
 | 2026-09-25 | Several concurrent GitHub Raw requests timed out | 1 | Retain verified local/official guidance and continue without repeating the same request pattern |
 | 2026-09-25 | Default sandbox denied loopback binding | 1 | Ran one controlled escalated smoke test, then stopped the process; in-memory tests remain the default CI path |
 
 ## 5-Question Reboot Check
-The local implementation, verification, and Git initialization phases are complete. Studio, device, Nebius deployment, and GitHub remote/evidence remain external gates.
+The local implementation, verification, Git initialization, and GitHub push phases are complete. Studio, device, and Nebius deployment evidence remain external gates.
 
 | Question | Answer |
 |----------|--------|
 | Where am I? | Phase 5 delivery |
-| Where am I going? | External Studio/device/Nebius/GitHub gates |
+| Where am I going? | External Studio/device/Nebius gates |
 | What's the goal? | Build GitHub-ready RepairLens for ROKID Glasses |
 | What have I learned? | See `findings.md`; AIUI 0.17 is the stable primary path |
 | What have I done? | Built and locally validated the AIUI source, backend contract, docs, and fallback boundary |

@@ -55,10 +55,10 @@ Phase 5
 ## Errors Encountered
 | Error | Attempt | Resolution |
 |-------|---------|------------|
-| Workspace has no Git repository or remote | 1 | Continue with source creation and document GitHub setup as an external gate |
+| Workspace initially had no Git repository or remote | 1 | Initialized Git, configured `origin`, and pushed `main` |
 | No ROKID hardware/Studio session available | 1 | Keep Studio/device evidence blocked and use static/local validation only |
 | Local sandbox denied loopback test-port binding | 1 | Test the exported HTTP handler with in-memory request/response objects; keep runtime listen as an external smoke gate |
 
 ## Notes
-- Never claim AIUI Studio, physical-device, package, or GitHub publication success without executing that gate.
+- Never claim AIUI Studio, physical-device, or package success without executing that gate; GitHub publication is verified at the remote commit.
 - Update `findings.md` after each research batch and `progress.md` after each phase or error.

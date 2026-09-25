@@ -13,6 +13,6 @@ This checklist separates source-level checks from evidence that requires AIUI St
 | Camera input | BLOCKED | Exact-model AIUI camera evidence |
 | `_current` / `_blank` host targets | BLOCKED | Host/runtime behavior evidence |
 | Nebius endpoint | BLOCKED | Deployment URL and health response |
-| GitHub remote and push | BLOCKED | Configured remote and commit URL |
+| GitHub remote and push | PASS | `origin` points to the public repository and `main` matches the remote commit |
 
 Before a real-device demo, record the exact glasses model, AIUI host/runtime version, API URL, and the captured input/rendering evidence here or in a dated evidence bundle. The Android/CXR-S fallback stays inactive until one of the AIUI capability gates is proven unavailable.
