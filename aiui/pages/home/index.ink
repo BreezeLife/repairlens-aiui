@@ -102,9 +102,9 @@ function initialState() {
     status: 'READY',
     equipment: 'HVAC condenser',
     symptom: 'Fan starts, then stops after two minutes',
-    summary: 'Describe an equipment issue, then confirm one safe action at a time.',
+    summary: 'Review this HVAC demo case, then confirm one action at a time.',
     risk: 'UNASSESSED',
-    nextAction: 'Ready to load a repair plan.',
+    nextAction: 'Ready to load the demo repair plan.',
     steps: [],
     currentStepIndex: 0,
     currentStepTitle: 'No active step',
@@ -121,7 +121,10 @@ function initialState() {
 }
 
 function normalizePlan(plan) {
-  const source = plan && typeof plan === 'object' ? plan : DEMO_PLAN;
+  if (!plan || typeof plan !== 'object' || Array.isArray(plan)) {
+    throw new Error('Repair plan is invalid');
+  }
+  const source = plan;
   if (source.actionable === false) {
     return {
       provider: compactSingleLine(source.provider, 'unknown', 18),
@@ -134,7 +137,24 @@ function normalizePlan(plan) {
       actionable: false,
     };
   }
-  const rawSteps = Array.isArray(source.steps) && source.steps.length ? source.steps : DEMO_PLAN.steps;
+  if (typeof source.equipment !== 'string'
+    || source.equipment.trim().toLowerCase() !== DEMO_PLAN.equipment.toLowerCase()
+    || !Array.isArray(source.steps) || !source.steps.length
+    || !source.steps.every((step) => step && typeof step.title === 'string' && step.title.trim()
+      && typeof step.detail === 'string' && step.detail.trim())
+    || !Array.isArray(source.evidence) || !source.evidence.length
+    || !source.evidence.some((item) => item && typeof item.source === 'string' && item.source.trim())) {
+    throw new Error('Repair plan is incomplete');
+  }
+  const rawSteps = source.steps;
+  const evidence = source.evidence
+    .filter((item) => item && typeof item.source === 'string' && item.source.trim())
+    .slice(0, 3)
+    .map((item, index) => ({
+      title: compactSingleLine(item.title, `Source ${index + 1}`, 24),
+      source: compactSingleLine(item.source, 'Unspecified source', 36),
+      excerpt: compactText(item.excerpt, '', 60),
+    }));
   const steps = rawSteps.slice(0, 6).map((step, index) => ({
     id: compactSingleLine(step.id, `step-${index + 1}`, 32),
     title: compactSingleLine(step.title, `Step ${index + 1}`, 28),
@@ -148,13 +168,8 @@ function normalizePlan(plan) {
     risk: compactRisk(source.risk),
     nextAction: compactText(source.nextAction, DEMO_PLAN.nextAction, 80),
     steps,
-    evidence: Array.isArray(source.evidence) && source.evidence.length
-      ? source.evidence.slice(0, 3).map((item, index) => ({
-          title: compactSingleLine(item && item.title, `Source ${index + 1}`, 24),
-          source: compactSingleLine(item && item.source, 'Unspecified source', 36),
-          excerpt: compactText(item && item.excerpt, '', 60),
-        }))
-      : DEMO_PLAN.evidence,
+    evidence,
+    warning: compactText(source.warning, '', 72),
     actionable: true,
   };
 }
@@ -258,12 +273,16 @@ export default {
           return;
         }
         const fallback = normalizePlan(DEMO_PLAN);
-        this.setData({ error: 'OFFLINE PLAN: network unavailable' });
-        this.applyPlan(fallback, true);
+        const message = error instanceof Error && /timed out/i.test(error.message)
+          ? 'OFFLINE PLAN: request timed out'
+          : error instanceof Error && /Repair plan/i.test(error.message)
+            ? 'OFFLINE PLAN: invalid provider response'
+            : 'OFFLINE PLAN: network unavailable';
+        this.applyPlan(fallback, true, message);
       });
   },
 
-  applyPlan(plan, usedFallback = false) {
+  applyPlan(plan, usedFallback = false, fallbackMessage = '') {
     if (!plan.actionable) {
       this.setData({
         flowState: 'blocked',
@@ -294,7 +313,7 @@ export default {
       evidenceSource: plan.evidence[0] && plan.evidence[0].source ? plan.evidence[0].source : 'Unspecified source',
       provider: compactSingleLine(usedFallback ? 'demo-fallback' : plan.provider, 'unknown', 18),
       error: usedFallback
-        ? 'OFFLINE PLAN: network unavailable'
+        ? fallbackMessage || 'OFFLINE PLAN: network unavailable'
         : (plan.warning ? `OFFLINE PLAN: ${compactText(plan.warning, 'provider unavailable', 72)}` : ''),
       lastInput: 'Repair plan ready',
     });
@@ -350,7 +369,7 @@ export default {
     </view>
 
     <view class="case-panel" ink:if="{{flowState === 'ready' || flowState === 'loading' || flowState === 'error' || flowState === 'blocked'}}">
-      <text class="label">CASE</text>
+      <text class="label">DEMO CASE</text>
       <text class="case-title">{{equipment}}</text>
       <text class="symptom">{{symptom}}</text>
     </view>
@@ -366,7 +385,7 @@ export default {
 
     <view class="step-panel" ink:if="{{flowState === 'loading' || flowState === 'step'}}">
       <view class="step-header">
-        <text class="label">NEXT VERIFIED ACTION</text>
+        <text class="label">NEXT ACTION</text>
         <view class="step-meta">
           <text class="step-risk risk-{{risk}}">RISK {{risk}}</text>
           <text class="step-count" ink:if="{{steps.length}}">{{currentStepIndex + 1}}/{{steps.length}}</text>

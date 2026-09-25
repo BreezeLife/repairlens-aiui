@@ -61,6 +61,7 @@ Copy `backend/.env.example` to `backend/.env` and set:
 
 Without these values, the backend deliberately returns a deterministic demo plan so the workflow remains testable.
 The offline repair sequence applies only to the documented HVAC condenser symptom. Other cases return `actionable: false` with no repair steps until an equipment-specific procedure is available.
+Malformed provider responses, missing evidence, and equipment mismatches are rejected before they can become an actionable plan; the Page shows an explicit `OFFLINE PLAN` fallback.
 
 The regular `npm --prefix backend start` command uses process environment variables. To load a local `.env` file, use Node 20.6+:
 

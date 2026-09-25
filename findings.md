@@ -46,12 +46,12 @@
 - Official documentation verified: PASS (local AIUI/Rokid guidance and official source links reviewed)
 - Working OSS reference: PASS (official AIUI project structure and samples identified)
 - Root cause clarity: PASS (local implementation is complete; remaining blockers are external hardware/runtime and Nebius deployment)
-- Local verification: PASS (`npm test`, 15 tests; root static validator)
+- Local verification: PASS (`npm test`, 16 tests; root static validator)
 - External verification: BLOCKED (AIUI Studio, physical device, Nebius deployment); GitHub `main` content is synchronized and verified through the Git Data API
 - Confidence: 92% for local source contract; device behavior remains unverified
 
 ## Implementation Findings
 - The AIUI Page uses `onVoiceWakeup` only to start the case. A wakeup event while a step is active cannot advance it; the user must use the validated button/Enter path.
-- The backend rejects missing `equipment`/`symptom` with 422, rejects non-JSON/oversized requests, limits model field lengths, and falls back when model JSON lacks usable evidence.
+- The backend rejects missing `equipment`/`symptom` with 422, rejects non-JSON/oversized requests, limits model field lengths, rejects equipment mismatches or steps without details, and falls back when model JSON lacks usable evidence. The Page applies the same integrity checks before rendering provider data.
 - The completion state records explicit confirmations in the Page session. Durable service-record export is intentionally outside v0 and is called out in the UI/docs.
 - `.env` loading is opt-in through `npm --prefix backend run start:env` on Node 20.6+; the default start path remains dependency-free demo mode.

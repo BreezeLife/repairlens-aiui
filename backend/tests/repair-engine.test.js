@@ -53,8 +53,19 @@ test('prompt requests conservative JSON and includes the issue context', () => {
 
 test('model response must include a usable evidence source', () => {
   assert.throws(
-    () => normalizeModelPlan({ steps: [{ title: 'Inspect' }], evidence: [] }),
+    () => normalizeModelPlan({ steps: [{ title: 'Inspect', detail: 'Check the unit.' }], evidence: [] }),
     /no usable evidence/,
+  );
+});
+
+test('model response must include an actionable step for the requested equipment', () => {
+  assert.throws(
+    () => normalizeModelPlan({ steps: [{ title: 'Inspect' }], evidence: [{ source: 'manual.pdf' }] }),
+    /no usable steps/,
+  );
+  assert.throws(
+    () => normalizeModelPlan({ equipment: 'Pump', steps: [{ title: 'Inspect', detail: 'Check the unit.' }], evidence: [{ source: 'manual.pdf' }] }, { equipment: 'HVAC condenser' }),
+    /different equipment case/,
   );
 });
 
@@ -62,7 +73,7 @@ test('model fields are bounded and unsupported risk values become unknown', () =
   const plan = normalizeModelPlan({
     summary: 'x'.repeat(700),
     risk: 'safe',
-    steps: [{ title: 'Inspect' }],
+    steps: [{ title: 'Inspect', detail: 'Check the unit.' }],
     evidence: [{ source: 'manual.pdf' }],
   });
   assert.equal(plan.summary.length, 500);
