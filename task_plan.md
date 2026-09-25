@@ -29,7 +29,7 @@ Phase 5
 
 ### Phase 4: Testing & Verification
 - [x] Run static project validation and repository tests
-- [ ] Run AIUI fingerprint/inventory/strict validation if scripts are available
+- [x] Run AIUI fingerprint/inventory/strict validation if scripts are available
 - [x] Record unavailable Studio/device/GitHub gates as blocked, never passed
 - **Status:** complete for available local gates; external runtime gates blocked
 

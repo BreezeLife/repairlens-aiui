@@ -42,9 +42,11 @@
 - **Status:** complete for local/static gates; external gates blocked
 - Actions taken:
   - `npm test`: 13 backend tests passed and AIUI 0.17 static validation passed.
+  - AIUI Agent fingerprint, capability inventory, and strict 0.17 project validation passed.
+  - AIX CLI 0.8.2 generated a browser preview and package; Playwright drove four Enter confirmations to `RECORDED / Repair sequence complete` on the 480x352 Ink canvas.
   - Node syntax checks passed for backend, tests, and validation script.
   - Replaced network-listen integration tests with in-memory HTTP handler tests because the local sandbox denies loopback binding.
-  - Kept AIUI Studio, physical ROKID, and Nebius deployment evidence explicitly blocked; verified the GitHub remote and pushed `main`.
+  - Kept AIUI Studio import, physical ROKID, and Nebius deployment evidence explicitly blocked; Web simulation passed, and the GitHub remote is synchronized.
 
 ### Phase 5: Delivery
 - **Status:** complete
@@ -57,6 +59,7 @@
 | Test | Input | Expected | Actual | Status |
 |------|-------|----------|--------|--------|
 | Repository scan | Empty project workspace | No duplicate app implementation | Only project records existed | PASS |
+| AIUI Web simulation | Local AIX preview | Page renders and accepts the Enter workflow | Four Enter confirmations reached `RECORDED` | PASS |
 | ROKID/AIUI device validation | No connected device | Evidence captured or blocker recorded | Device unavailable | BLOCKED |
 | GitHub remote and push | Current workspace | Configured remote and matching commit | `origin/main` matches the public repository | PASS |
 | Backend + static validation | Local workspace | Contract tests and project structure pass | 13 tests pass; validator pass | PASS |

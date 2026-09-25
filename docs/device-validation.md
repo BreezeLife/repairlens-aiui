@@ -6,7 +6,8 @@ This checklist separates source-level checks from evidence that requires AIUI St
 |------|----------------|-----------------|
 | AIUI 0.17 project structure | PASS | Root validator and source tree |
 | AIUI Studio import | BLOCKED | Studio import log or screenshot |
-| 480x352 Page rendering | BLOCKED | Studio simulation or device capture |
+| AIUI Web simulation | PASS | AIX CLI 0.8.2 `preview --dev --launch`; Ink runtime initialized a 480x352 Page and rendered the RepairLens canvas |
+| 480x352 Page rendering | PASS | Playwright capture from the AIX Web simulation; non-empty canvas at `/tmp/repairlens-live-enter-1.png` |
 | Voice wakeup event | BLOCKED | Target-device event log |
 | Enter key confirmation | BLOCKED | Target-device event log |
 | `GlobalHook` confirmation | BLOCKED | Exact-model capability evidence |
