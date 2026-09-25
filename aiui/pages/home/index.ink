@@ -7,6 +7,59 @@
 <script setup>
 import wx from 'wx';
 
+const REQUEST_TIMEOUT_MS = 14000;
+const RISK_LEVELS = new Set(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'UNKNOWN', 'UNASSESSED']);
+let requestSequence = 0;
+
+function compactText(value, fallback, maxLength) {
+  const normalized = typeof value === 'string' ? value.trim() : '';
+  if (!normalized) {
+    return fallback;
+  }
+  if (normalized.length <= maxLength) {
+    return normalized;
+  }
+  return `${normalized.slice(0, Math.max(1, maxLength - 3)).trimEnd()}...`;
+}
+
+function compactSingleLine(value, fallback, maxLength) {
+  const normalized = typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
+  return compactText(normalized, fallback, maxLength);
+}
+
+function compactRisk(value, fallback = 'UNKNOWN') {
+  const normalized = typeof value === 'string' ? value.trim().toUpperCase() : '';
+  return RISK_LEVELS.has(normalized) ? normalized : fallback;
+}
+
+function fetchWithTimeout(url, options, timeoutMs = REQUEST_TIMEOUT_MS) {
+  let timer;
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  const requestOptions = controller ? { ...options, signal: controller.signal } : options;
+  const request = Promise.resolve().then(() => fetch(url, requestOptions));
+  const timeout = new Promise((resolve, reject) => {
+    timer = setTimeout(() => {
+      if (controller) {
+        controller.abort();
+      }
+      reject(new Error('repair API timed out'));
+    }, timeoutMs);
+  });
+  return Promise.race([request, timeout]).then(
+    (value) => {
+      clearTimeout(timer);
+      return value;
+    },
+    (error) => {
+      clearTimeout(timer);
+      if (controller) {
+        controller.abort();
+      }
+      throw error;
+    },
+  );
+}
+
 const DEMO_PLAN = {
   provider: 'demo-fallback',
   model: 'repairlens-demo',
@@ -63,6 +116,7 @@ function initialState() {
     provider: 'offline',
     lastInput: 'None',
     error: '',
+    requestToken: 0,
   };
 }
 
@@ -70,11 +124,11 @@ function normalizePlan(plan) {
   const source = plan && typeof plan === 'object' ? plan : DEMO_PLAN;
   if (source.actionable === false) {
     return {
-      provider: source.provider || 'unknown',
-      equipment: source.equipment || DEMO_PLAN.equipment,
-      summary: source.summary || 'No approved procedure is available for this case.',
-      risk: source.risk || 'UNKNOWN',
-      nextAction: source.nextAction || 'Pause work and obtain the equipment-specific service procedure.',
+      provider: compactSingleLine(source.provider, 'unknown', 18),
+      equipment: compactSingleLine(source.equipment, DEMO_PLAN.equipment, 40),
+      summary: compactText(source.summary, 'No approved procedure is available for this case.', 100),
+      risk: compactRisk(source.risk),
+      nextAction: compactText(source.nextAction, 'Pause work and obtain the equipment-specific service procedure.', 80),
       steps: [],
       evidence: [],
       actionable: false,
@@ -82,20 +136,24 @@ function normalizePlan(plan) {
   }
   const rawSteps = Array.isArray(source.steps) && source.steps.length ? source.steps : DEMO_PLAN.steps;
   const steps = rawSteps.slice(0, 6).map((step, index) => ({
-    id: String(step.id || `step-${index + 1}`),
-    title: String(step.title || `Step ${index + 1}`),
-    detail: String(step.detail || 'Follow the verified procedure.'),
-    confirmPrompt: String(step.confirmPrompt || 'Confirm this action is complete?'),
+    id: compactSingleLine(step.id, `step-${index + 1}`, 32),
+    title: compactSingleLine(step.title, `Step ${index + 1}`, 28),
+    detail: compactText(step.detail, 'Follow the verified procedure.', 100),
+    confirmPrompt: compactText(step.confirmPrompt, 'Confirm this action is complete?', 48),
   }));
   return {
-    provider: source.provider || 'unknown',
-    equipment: source.equipment || DEMO_PLAN.equipment,
-    summary: source.summary || DEMO_PLAN.summary,
-    risk: source.risk || 'UNKNOWN',
-    nextAction: source.nextAction || DEMO_PLAN.nextAction,
+    provider: compactSingleLine(source.provider, 'unknown', 18),
+    equipment: compactSingleLine(source.equipment, DEMO_PLAN.equipment, 40),
+    summary: compactText(source.summary, DEMO_PLAN.summary, 100),
+    risk: compactRisk(source.risk),
+    nextAction: compactText(source.nextAction, DEMO_PLAN.nextAction, 80),
     steps,
     evidence: Array.isArray(source.evidence) && source.evidence.length
-      ? source.evidence.slice(0, 3)
+      ? source.evidence.slice(0, 3).map((item, index) => ({
+          title: compactSingleLine(item && item.title, `Source ${index + 1}`, 24),
+          source: compactSingleLine(item && item.source, 'Unspecified source', 36),
+          excerpt: compactText(item && item.excerpt, '', 60),
+        }))
       : DEMO_PLAN.evidence,
     actionable: true,
   };
@@ -155,6 +213,7 @@ export default {
       return;
     }
 
+    const requestToken = ++requestSequence;
     this.setData({
       flowState: 'loading',
       status: 'ANALYZING',
@@ -165,6 +224,7 @@ export default {
       currentStepDetail: 'The Agent is checking the symptom against the repair workflow.',
       currentStepPrompt: 'Please wait',
       lastInput: 'Start repair',
+      requestToken,
     });
 
     const app = getApp();
@@ -173,7 +233,7 @@ export default {
       : 'http://127.0.0.1:8787';
     const baseUrl = configuredBaseUrl.replace(/\/+$/, '');
 
-    fetch(`${baseUrl}/api/repair/analyze`, {
+    fetchWithTimeout(`${baseUrl}/api/repair/analyze`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -188,12 +248,17 @@ export default {
         }
         return response.json();
       })
-      .then((plan) => this.applyPlan(normalizePlan(plan)))
+      .then((plan) => {
+        if (this.data.requestToken === requestToken) {
+          this.applyPlan(normalizePlan(plan));
+        }
+      })
       .catch((error) => {
+        if (this.data.requestToken !== requestToken) {
+          return;
+        }
         const fallback = normalizePlan(DEMO_PLAN);
-        this.setData({
-          error: `Using offline plan: ${error && error.message ? error.message : 'network unavailable'}`,
-        });
+        this.setData({ error: 'OFFLINE PLAN: network unavailable' });
         this.applyPlan(fallback, true);
       });
   },
@@ -208,15 +273,16 @@ export default {
         nextAction: plan.nextAction,
         steps: [],
         evidence: [],
-        provider: plan.provider,
+        provider: compactSingleLine(plan.provider, 'unknown', 18),
         lastInput: 'Case paused',
       });
       return;
     }
     const stepState = getCurrentStep(plan, 0);
+    const isOffline = usedFallback || plan.provider === 'demo-fallback' || Boolean(plan.warning);
     this.setData({
       flowState: 'step',
-      status: usedFallback ? 'OFFLINE PLAN' : 'PLAN READY',
+      status: isOffline ? 'OFFLINE PLAN' : 'PLAN READY',
       summary: plan.summary,
       risk: plan.risk,
       nextAction: plan.nextAction,
@@ -226,7 +292,10 @@ export default {
       evidence: plan.evidence,
       evidenceTitle: plan.evidence[0] && plan.evidence[0].title ? plan.evidence[0].title : 'Source available',
       evidenceSource: plan.evidence[0] && plan.evidence[0].source ? plan.evidence[0].source : 'Unspecified source',
-      provider: usedFallback ? 'demo-fallback' : plan.provider,
+      provider: compactSingleLine(usedFallback ? 'demo-fallback' : plan.provider, 'unknown', 18),
+      error: usedFallback
+        ? 'OFFLINE PLAN: network unavailable'
+        : (plan.warning ? `OFFLINE PLAN: ${compactText(plan.warning, 'provider unavailable', 72)}` : ''),
       lastInput: 'Repair plan ready',
     });
   },
@@ -260,6 +329,7 @@ export default {
   resetFlow() {
     this.setData({
       ...initialState(),
+      requestToken: ++requestSequence,
       lastInput: 'New case',
     });
   },
@@ -342,9 +412,11 @@ export default {
   .screen {
     display: flex;
     flex-direction: column;
-    padding: 8px 12px;
+    padding: 8px 16px;
     gap: 6px;
     min-height: 328px;
+    height: 328px;
+    overflow: hidden;
   }
 
   .topbar,
@@ -497,6 +569,8 @@ export default {
     color: #ffb347;
     font-size: 11px;
     line-height: 15px;
+    max-height: 15px;
+    overflow: hidden;
   }
 
   .controls {
@@ -515,6 +589,12 @@ export default {
     font-weight: bold;
     padding: 8px 10px;
     text-align: center;
+  }
+
+  button.primary:focus {
+    border-color: #d4f2d8;
+    background-color: #40ff5e;
+    color: #07110a;
   }
 
 </style>

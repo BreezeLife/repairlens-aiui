@@ -41,7 +41,8 @@
 ### Phase 4: Testing & Verification
 - **Status:** complete for local/static gates; external gates blocked
 - Actions taken:
-  - `npm test`: 13 backend tests passed and AIUI 0.17 static validation passed.
+  - `npm test`: 15 backend tests passed and AIUI 0.17 static validation passed.
+  - Rechecked UI and recovery behavior with AIX Web simulation: normal completion, immediate network failure, 14-second timeout, and oversized model text all kept the confirmation action visible.
   - AIUI Agent fingerprint, capability inventory, and strict 0.17 project validation passed.
   - AIX CLI 0.8.2 generated a browser preview and package; Playwright drove four Enter confirmations to `RECORDED / Repair sequence complete` on the 480x352 Ink canvas.
   - Node syntax checks passed for backend, tests, and validation script.
@@ -61,8 +62,8 @@
 | Repository scan | Empty project workspace | No duplicate app implementation | Only project records existed | PASS |
 | AIUI Web simulation | Local AIX preview | Page renders and accepts the Enter workflow | Four Enter confirmations reached `RECORDED` | PASS |
 | ROKID/AIUI device validation | No connected device | Evidence captured or blocker recorded | Device unavailable | BLOCKED |
-| GitHub remote and push | Current workspace | Configured remote and matching commit | `origin/main` matches the public repository | PASS |
-| Backend + static validation | Local workspace | Contract tests and project structure pass | 13 tests pass; validator pass | PASS |
+| GitHub remote and push | Current workspace | Latest local commit published | `origin` is configured, but `b05d862` is one commit ahead after GitHub 443 timeouts | BLOCKED |
+| Backend + static validation | Local workspace | Contract tests and project structure pass | 15 tests pass; validator pass | PASS |
 | Backend HTTP smoke test | Escalated local process | `/health` and HVAC analyze response | 200; complete fallback contract | PASS |
 
 ## Error Log
@@ -71,14 +72,15 @@
 | 2026-09-25 | No Git repository in workspace | 1 | Initialized local repository, configured `origin`, and pushed `main` |
 | 2026-09-25 | Several concurrent GitHub Raw requests timed out | 1 | Retain verified local/official guidance and continue without repeating the same request pattern |
 | 2026-09-25 | Default sandbox denied loopback binding | 1 | Ran one controlled escalated smoke test, then stopped the process; in-memory tests remain the default CI path |
+| 2026-09-26 | GitHub HTTPS push timed out | 3 | Keep local commit `b05d862` intact and retry when GitHub connectivity is available |
 
 ## 5-Question Reboot Check
-The local implementation, verification, Git initialization, and GitHub push phases are complete. Studio, device, and Nebius deployment evidence remain external gates.
+The local implementation, verification, and Git initialization phases are complete. The latest local hardening commit is ready but not yet published because GitHub connections timed out. Studio, device, and Nebius deployment evidence remain external gates.
 
 | Question | Answer |
 |----------|--------|
 | Where am I? | Phase 5 delivery |
-| Where am I going? | External Studio/device/Nebius gates |
+| Where am I going? | GitHub retry, then external Studio/device/Nebius gates |
 | What's the goal? | Build GitHub-ready RepairLens for ROKID Glasses |
 | What have I learned? | See `findings.md`; AIUI 0.17 is the stable primary path |
 | What have I done? | Built and locally validated the AIUI source, backend contract, docs, and fallback boundary |

@@ -81,3 +81,14 @@ test('provider failures return a deterministic warning-bearing fallback', async 
   assert.equal(plan.actionable, false);
   assert.ok(plan.requestId);
 });
+
+test('an empty provider result falls back without exposing repair steps for an unknown case', async () => {
+  const plan = await analyzeRepair(
+    { equipment: 'Pump', symptom: 'Stops under load' },
+    async () => null,
+  );
+  assert.equal(plan.provider, 'demo-fallback');
+  assert.equal(plan.actionable, false);
+  assert.deepEqual(plan.steps, []);
+  assert.ok(plan.requestId);
+});

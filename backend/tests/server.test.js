@@ -62,6 +62,14 @@ test('health endpoint reports the deterministic mode and handles query strings',
   assert.match(response.body.mode, /^(demo-fallback|nebius-configured)$/);
 });
 
+test('OPTIONS preflight exposes the JSON POST contract without a body', async () => {
+  const response = await request({ method: 'OPTIONS', url: '/api/repair/analyze' });
+  assert.equal(response.status, 204);
+  assert.equal(response.body, null);
+  assert.equal(response.headers['access-control-allow-methods'], 'GET,POST,OPTIONS');
+  assert.equal(response.headers['access-control-allow-headers'], 'content-type');
+});
+
 test('analyze endpoint returns the complete repair contract', async () => {
   const response = await request({
     method: 'POST',

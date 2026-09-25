@@ -54,14 +54,14 @@ if (!app || !Array.isArray(app.pages) || app.pages.length !== 1 || app.pages[0] 
 if (!appEntry.includes("targetVersion: '0.17.0'")) {
   errors.push('aiui/app.js must declare targetVersion 0.17.0');
 }
-for (const marker of ['<script setup>', '<page>', '<style>', 'onVoiceWakeup', 'onKeyDown', 'onKeyUp', '/api/repair/analyze']) {
+for (const marker of ['<script setup>', '<page>', '<style>', 'onVoiceWakeup', 'onKeyDown', 'onKeyUp', 'fetchWithTimeout', 'REQUEST_TIMEOUT_MS', '/api/repair/analyze']) {
   if (!page.includes(marker)) errors.push(`AIUI page is missing ${marker}`);
 }
 if (page.includes('GlobalHook')) {
   errors.push('AIUI source must not claim unverified GlobalHook support');
 }
-if (!audit || audit.scopeClosed !== false || !Array.isArray(audit.claims)) {
-  errors.push('AIUI audit claims must remain open until Studio/device evidence is captured');
+if (!audit || audit.schemaVersion !== 1 || audit.scopeClosed !== true || !Array.isArray(audit.claims)) {
+  errors.push('AIUI audit claims must be a closed schema-1 scope with an array of claims');
 }
 if (!backendPackage || backendPackage.scripts?.test !== 'node --test') {
   errors.push('backend/package.json must expose the node test runner');

@@ -49,6 +49,7 @@ aiui/
 ```
 
 The AIUI Page defaults to an offline demo plan if the configured API cannot be reached. The v0 source uses a fixed HVAC demonstration case because AIUI 0.17 voice wakeup exposes an event, not a proven speech-transcript contract; bind a validated transcript or companion input before presenting free-form issue capture.
+The Page labels this state `OFFLINE PLAN`, times out a repair request after 14 seconds, ignores late responses after a reset, and bounds model text before rendering it into the 480x352 viewport.
 
 ## Nebius configuration
 
