@@ -47,7 +47,7 @@
 - Working OSS reference: PASS (official AIUI project structure and samples identified)
 - Root cause clarity: PASS (local implementation is complete; remaining blockers are external hardware/runtime and Nebius deployment)
 - Local verification: PASS (`npm test`, 15 tests; root static validator)
-- External verification: BLOCKED (AIUI Studio, physical device, Nebius deployment, latest GitHub push); `origin` remains configured and the previous remote commit is verified
+- External verification: BLOCKED (AIUI Studio, physical device, Nebius deployment); GitHub `main` content is synchronized and verified through the Git Data API
 - Confidence: 92% for local source contract; device behavior remains unverified
 
 ## Implementation Findings

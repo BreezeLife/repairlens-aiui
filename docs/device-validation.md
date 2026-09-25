@@ -16,6 +16,6 @@ This checklist separates source-level checks from evidence that requires AIUI St
 | Camera input | BLOCKED | Exact-model AIUI camera evidence |
 | `_current` / `_blank` host targets | BLOCKED | Host/runtime behavior evidence |
 | Nebius endpoint | BLOCKED | Deployment URL and health response |
-| GitHub remote and push | BLOCKED | `origin` is configured, but latest local commit `b05d862` is awaiting push after GitHub 443 connection timeouts |
+| GitHub remote and push | PASS | GitHub `main` content tree matches the local hardening tree; remote commit `a54798e` was verified through the Git Data API |
 
 Before a real-device demo, record the exact glasses model, AIUI host/runtime version, API URL, and the captured input/rendering evidence here or in a dated evidence bundle. The Android/CXR-S fallback stays inactive until one of the AIUI capability gates is proven unavailable.
