@@ -274,11 +274,12 @@ export default {
           return;
         }
         const fallback = normalizePlan(DEMO_PLAN);
-        const message = error instanceof Error && /timed out/i.test(error.message)
+        const errorText = error instanceof Error ? error.message : '';
+        const message = /timed out/i.test(errorText)
           ? 'OFFLINE PLAN: request timed out'
-          : error instanceof Error && /Repair plan/i.test(error.message)
-            ? 'OFFLINE PLAN: invalid provider response'
-            : 'OFFLINE PLAN: network unavailable';
+          : /failed to fetch|network|aborted|Repair API returned/i.test(errorText)
+            ? 'OFFLINE PLAN: network unavailable'
+            : 'OFFLINE PLAN: invalid provider response';
         this.setData({ requestToken: ++requestSequence });
         this.applyPlan(fallback, true, message);
       });
