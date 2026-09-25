@@ -54,4 +54,5 @@
 - The AIUI Page uses `onVoiceWakeup` only to start the case. A wakeup event while a step is active cannot advance it; the user must use the validated button/Enter path.
 - The backend rejects missing `equipment`/`symptom` with 422, rejects non-JSON/oversized requests, limits model field lengths, rejects equipment mismatches or steps without details, and falls back when model JSON lacks usable evidence. The Page applies the same integrity checks before rendering provider data.
 - The completion state records explicit confirmations in the Page session. Durable service-record export is intentionally outside v0 and is called out in the UI/docs.
+- The Page advances a request sequence on reset and fallback, so late responses cannot overwrite a timeout or recovery state even when request cancellation is unavailable.
 - `.env` loading is opt-in through `npm --prefix backend run start:env` on Node 20.6+; the default start path remains dependency-free demo mode.

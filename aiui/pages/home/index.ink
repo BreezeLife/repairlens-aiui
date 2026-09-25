@@ -139,6 +139,7 @@ function normalizePlan(plan) {
   }
   if (typeof source.equipment !== 'string'
     || source.equipment.trim().toLowerCase() !== DEMO_PLAN.equipment.toLowerCase()
+    || typeof source.provider !== 'string' || !source.provider.trim()
     || !Array.isArray(source.steps) || !source.steps.length
     || !source.steps.every((step) => step && typeof step.title === 'string' && step.title.trim()
       && typeof step.detail === 'string' && step.detail.trim())
@@ -278,6 +279,7 @@ export default {
           : error instanceof Error && /Repair plan/i.test(error.message)
             ? 'OFFLINE PLAN: invalid provider response'
             : 'OFFLINE PLAN: network unavailable';
+        this.setData({ requestToken: ++requestSequence });
         this.applyPlan(fallback, true, message);
       });
   },

@@ -42,7 +42,7 @@
 - **Status:** complete for local/static gates; external gates blocked
 - Actions taken:
   - `npm test`: 16 backend tests passed and AIUI 0.17 static validation passed.
-  - Rechecked UI and recovery behavior with AIX Web simulation: normal completion, network failure, empty/invalid provider response, 14-second timeout, and oversized model text all kept the confirmation action visible.
+  - Rechecked UI and recovery behavior with AIX Web simulation: normal completion, network failure, empty/invalid provider response, 14-second timeout, oversized model text, and a delayed response after a no-op abort all kept the confirmation action visible without stale state overwrite.
   - AIUI Agent fingerprint, capability inventory, and strict 0.17 project validation passed.
   - AIX CLI 0.8.2 generated a browser preview and package; Playwright drove four Enter confirmations to `RECORDED / Repair sequence complete` on the 480x352 Ink canvas.
   - Node syntax checks passed for backend, tests, and validation script.
